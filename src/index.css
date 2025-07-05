@@ -1,0 +1,254 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 30 8% 95%;
+    --foreground: 30 8% 15%;
+
+    --card: 30 8% 98%;
+    --card-foreground: 30 8% 15%;
+
+    --popover: 30 8% 98%;
+    --popover-foreground: 30 8% 15%;
+
+    --primary: 25 95% 35%;
+    --primary-foreground: 30 8% 95%;
+
+    --secondary: 42 87% 78%;
+    --secondary-foreground: 30 8% 15%;
+
+    --muted: 42 87% 90%;
+    --muted-foreground: 30 8% 45%;
+
+    --accent: 42 87% 85%;
+    --accent-foreground: 30 8% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 42 87% 85%;
+    --input: 42 87% 85%;
+    --ring: 25 95% 35%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 30 8% 8%;
+    --foreground: 30 8% 95%;
+
+    --card: 30 8% 12%;
+    --card-foreground: 30 8% 95%;
+
+    --popover: 30 8% 12%;
+    --popover-foreground: 30 8% 95%;
+
+    --primary: 25 95% 45%;
+    --primary-foreground: 30 8% 8%;
+
+    --secondary: 42 20% 20%;
+    --secondary-foreground: 30 8% 95%;
+
+    --muted: 42 20% 15%;
+    --muted-foreground: 30 8% 65%;
+
+    --accent: 42 20% 25%;
+    --accent-foreground: 30 8% 95%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 42 20% 20%;
+    --input: 42 20% 20%;
+    --ring: 25 95% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .coffee-steam::before {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 30px;
+    background: linear-gradient(to top, rgba(255,255,255,0.8), transparent);
+    border-radius: 50%;
+    animation: steam 2s ease-out infinite;
+  }
+
+  .coffee-steam::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 25px;
+    background: linear-gradient(to top, rgba(255,255,255,0.6), transparent);
+    border-radius: 50%;
+    left: 8px;
+    animation: steam 2s ease-out infinite 0.5s;
+  }
+
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #d97706, #f59332, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .parallax {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Enhanced Glow Effects */
+  .pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  .mega-glow {
+    animation: mega-glow 4s ease-in-out infinite;
+  }
+
+  /* Floating Text Effect */
+  .floating-text {
+    animation: floating-text 6s ease-in-out infinite;
+  }
+
+  /* Curved Design Elements */
+  .curve-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), transparent);
+    transform: skewX(-12deg);
+    border-radius: 0 0 0 50px;
+  }
+
+  /* Coffee Bean Scatter Effect */
+  .bean-scatter {
+    position: relative;
+  }
+
+  .bean-scatter::before,
+  .bean-scatter::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 12px;
+    background: #7c2d12;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: bean-float 4s ease-in-out infinite;
+  }
+
+  .bean-scatter::before {
+    top: -20px;
+    left: -15px;
+    animation-delay: 0s;
+  }
+
+  .bean-scatter::after {
+    bottom: -15px;
+    right: -20px;
+    animation-delay: 2s;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(217, 119, 6, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(217, 119, 6, 0.6);
+  }
+}
+
+@keyframes mega-glow {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(217, 119, 6, 0.4), 0 0 60px rgba(245, 147, 50, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(217, 119, 6, 0.8), 0 0 120px rgba(245, 147, 50, 0.4);
+  }
+}
+
+@keyframes floating-text {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  33% {
+    transform: translateY(-10px);
+  }
+  66% {
+    transform: translateY(5px);
+  }
+}
+
+@keyframes bean-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(-8px) rotate(90deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-15px) rotate(180deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-8px) rotate(270deg);
+    opacity: 0.8;
+  }
+}
+
+/* Enhanced Steam Animation */
+@keyframes steam {
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translateY(-15px) scale(1.1) rotate(5deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-30px) scale(1.2) rotate(-3deg);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translateY(-45px) scale(1.3) rotate(2deg);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-60px) scale(1.4) rotate(0deg);
+    opacity: 0;
+  }
+}
