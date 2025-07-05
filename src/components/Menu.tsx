@@ -115,12 +115,12 @@ const Menu = () => {
 
         {/* Enhanced Category Tabs */}
         <div className="flex justify-center mb-12">
-          <div className="bg-white/60 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-cream-200">
+          <div className="bg-white/60 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-cream-200 flex">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`flex items-center space-x-3 px-8 py-4 rounded-xl font-medium transition-all duration-300 ${
+                className={`flex items-center justify-center space-x-3 px-8 py-4 rounded-xl font-medium transition-all duration-300 ${
                   activeCategory === category.id
                     ? 'bg-gradient-to-r from-coffee-600 to-coffee-700 text-white shadow-xl transform scale-105'
                     : 'text-coffee-700 hover:bg-cream-100/80 hover:scale-102'

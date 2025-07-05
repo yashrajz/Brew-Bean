@@ -56,7 +56,7 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
                 Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua.
               </p>
               
-              <button className="group bg-gradient-to-r from-coffee-600 to-coffee-700 hover:from-coffee-700 hover:to-coffee-800 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-500 hover:shadow-xl hover:scale-105 flex items-center space-x-3 animate-scale-in" style={{ animationDelay: '0.5s' }}>
+              <button className="group bg-gradient-to-r from-coffee-600 to-coffee-700 hover:from-coffee-700 hover:to-coffee-800 text-white px-8 py-4 rounded-md text-lg font-medium transition-all duration-500 hover:shadow-xl hover:scale-105 flex items-center space-x-3 animate-scale-in" style={{ animationDelay: '0.5s' }}>
                 <span>ORDER NOW</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
