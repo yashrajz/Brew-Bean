@@ -1,5 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
+import LoadingScreen from '../components/LoadingScreen';
 import Navigation from '../components/Navigation';
 import Hero from '../components/Hero';
 import Menu from '../components/Menu';
@@ -9,6 +9,7 @@ import Footer from '../components/Footer';
 
 const Index = () => {
   const [scrollY, setScrollY] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -16,9 +17,17 @@ const Index = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream-50 to-cream-100">
-      <Navigation />
+      {/* Loading Screen Overlay */}
+      {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
+      
+      {/* Main Content */}
+      <Navigation isLoading={isLoading} />
       <main>
         <Hero scrollY={scrollY} />
         <Menu />

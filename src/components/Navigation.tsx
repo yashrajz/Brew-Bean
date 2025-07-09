@@ -2,7 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Coffee, Menu, X, ArrowRight } from 'lucide-react';
 
-const Navigation = () => {
+interface NavigationProps {
+  isLoading?: boolean;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ isLoading = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -11,7 +15,6 @@ const Navigation = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
       
-      // Update active section based on scroll position
       const sections = ['home', 'menu', 'about', 'contact'];
       const current = sections.find(section => {
         const element = document.getElementById(section);
@@ -34,7 +37,7 @@ const Navigation = () => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-    setIsMobileMenuOpen(false); // Close mobile menu when navigating
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -45,7 +48,9 @@ const Navigation = () => {
     }`}>
       <div className="container mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 group cursor-pointer relative overflow-hidden" onClick={() => scrollToSection('home')}>
+          <div className={`flex items-center space-x-3 group cursor-pointer relative overflow-hidden transition-opacity duration-500 ${
+            isLoading ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`} onClick={() => scrollToSection('home')}>
             <div className="relative">
               <img 
                 src="/logo.svg" 
