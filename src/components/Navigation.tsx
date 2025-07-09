@@ -47,7 +47,11 @@ const Navigation = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3 group cursor-pointer relative overflow-hidden" onClick={() => scrollToSection('home')}>
             <div className="relative">
-              <Coffee className="w-7 h-7 text-coffee-600 group-hover:text-coffee-500 transition-all duration-500 group-hover:scale-110 group-hover:rotate-12 drop-shadow-lg" />
+              <img 
+                src="/logo.svg" 
+                alt="Brew & Bean Logo" 
+                className="w-8 h-8 transition-all duration-500 group-hover:scale-110 group-hover:rotate-12 drop-shadow-lg" 
+              />
               <div className="absolute inset-0 bg-coffee-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 scale-150 blur-xl"></div>
             </div>
             <div className="relative">
@@ -96,7 +100,9 @@ const Navigation = () => {
             ))}
           </div>
 
-          <button className={`bg-gradient-to-r from-coffee-600 to-coffee-500 hover:from-coffee-500 hover:to-coffee-400 text-white px-6 py-2 rounded-md font-medium transition-all duration-700 ease-out hidden md:block group relative overflow-hidden ${
+          <button 
+            onClick={() => scrollToSection('menu')}
+            className={`bg-gradient-to-r from-coffee-600 to-coffee-500 hover:from-coffee-500 hover:to-coffee-400 text-white px-6 py-2 rounded-md font-medium transition-all duration-700 ease-out hidden md:block group relative overflow-hidden ${
             isScrolled ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
           }`} style={{ transitionDelay: isScrolled ? '400ms' : '0ms' }}>
             {/* Animated background */}
@@ -184,6 +190,7 @@ const Navigation = () => {
             
             <div className="pt-4">
               <button 
+                onClick={() => scrollToSection('menu')}
                 className="w-full bg-gradient-to-r from-coffee-600 to-coffee-500 hover:from-coffee-500 hover:to-coffee-400 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-500 ease-out group relative overflow-hidden"
                 style={{ 
                   transitionDelay: isMobileMenuOpen && isScrolled ? '200ms' : '0ms',

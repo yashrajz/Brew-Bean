@@ -34,6 +34,14 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
         {/* Animated coffee beans trail */}
         <div className="absolute top-1/4 left-1/4 w-2 h-3 bg-coffee-700 rounded-full animate-float opacity-60" style={{ animationDelay: '0s' }}></div>
         <div className="absolute top-1/3 left-1/3 w-1.5 h-2.5 bg-coffee-600 rounded-full animate-float opacity-40" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute top-1/2 left-1/6 w-2.5 h-3.5 bg-coffee-800 rounded-full animate-float opacity-70" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-2/3 left-1/5 w-1.5 h-2 bg-coffee-600 rounded-full animate-float opacity-50" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute top-3/4 left-1/3 w-2 h-2.5 bg-coffee-700 rounded-full animate-float opacity-60" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/6 left-1/5 w-1.5 h-2.5 bg-coffee-800 rounded-full animate-float opacity-45" style={{ animationDelay: '2.5s' }}></div>
+        <div className="absolute top-1/2 left-1/4 w-2 h-3 bg-coffee-600 rounded-full animate-float opacity-55" style={{ animationDelay: '3s' }}></div>
+        <div className="absolute top-5/6 left-1/6 w-1.5 h-2 bg-coffee-700 rounded-full animate-float opacity-50" style={{ animationDelay: '3.5s' }}></div>
+        <div className="absolute top-1/8 left-1/3 w-2.5 h-3 bg-coffee-800 rounded-full animate-float opacity-65" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute top-3/5 left-1/8 w-1.5 h-2.5 bg-coffee-600 rounded-full animate-float opacity-40" style={{ animationDelay: '4.5s' }}></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -70,7 +78,14 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
                 <div className="text-sm text-coffee-600">⭐ 4.9/5 Rating</div>
               </div> */}
               
-              <button className="group bg-gradient-to-r from-coffee-600 to-coffee-700 hover:from-coffee-700 hover:to-coffee-800 text-white px-8 py-4 rounded-md text-lg font-medium transition-all duration-500 hover:shadow-xl hover:scale-105 flex items-center space-x-3 animate-scale-in" style={{ animationDelay: '0.5s' }}>
+              <button 
+                onClick={() => {
+                  const menuSection = document.getElementById('menu');
+                  if (menuSection) {
+                    menuSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="group bg-gradient-to-r from-coffee-600 to-coffee-700 hover:from-coffee-700 hover:to-coffee-800 text-white px-8 py-4 rounded-md text-lg font-medium transition-all duration-500 hover:shadow-xl hover:scale-105 flex items-center space-x-3 animate-scale-in cursor-pointer" style={{ animationDelay: '0.5s' }}>
                 <span>ORDER NOW</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
