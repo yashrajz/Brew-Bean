@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Coffee, Star, Heart, Sparkles, ArrowRight } from 'lucide-react';
 
@@ -31,12 +30,17 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
         <div className="absolute top-1/2 right-1/3 animate-float" style={{ animationDelay: '2s' }}>
           <Heart className="w-5 h-5 text-red-300 opacity-40" />
         </div>
+        
+        {/* Animated coffee beans trail */}
+        <div className="absolute top-1/4 left-1/4 w-2 h-3 bg-coffee-700 rounded-full animate-float opacity-60" style={{ animationDelay: '0s' }}></div>
+        <div className="absolute top-1/3 left-1/3 w-1.5 h-2.5 bg-coffee-600 rounded-full animate-float opacity-40" style={{ animationDelay: '0.5s' }}></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-screen">
+        {/* Better mobile layout */}
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-screen">
           {/* Left Content Section */}
-          <div className="text-left animate-fade-in-up">
+          <div className="order-2 lg:order-1 text-center lg:text-left animate-fade-in-up">
             <div className="mb-8">
               <p className="text-coffee-600 font-medium text-lg mb-4 animate-slide-in-left">
                 Power up with coffee
@@ -52,9 +56,19 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
                 </span>
               </h1>
               
-              <p className="text-coffee-600 text-lg leading-relaxed mb-8 max-w-md animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua.
+              <p className="text-coffee-600 text-lg leading-relaxed mb-8 max-w-md">
+                Start your day with artisan-crafted coffee, expertly roasted to perfection. 
+                Every cup tells a story of passion, quality, and unforgettable flavor.
               </p>
+              
+              {/* <div className="flex items-center space-x-6 mb-8">
+                <div className="flex items-center space-x-2">
+                  <div className="flex -space-x-2">
+                  </div>
+                  <span className="text-sm text-coffee-600">500+ Happy Customers</span>
+                </div>
+                <div className="text-sm text-coffee-600">⭐ 4.9/5 Rating</div>
+              </div> */}
               
               <button className="group bg-gradient-to-r from-coffee-600 to-coffee-700 hover:from-coffee-700 hover:to-coffee-800 text-white px-8 py-4 rounded-md text-lg font-medium transition-all duration-500 hover:shadow-xl hover:scale-105 flex items-center space-x-3 animate-scale-in" style={{ animationDelay: '0.5s' }}>
                 <span>ORDER NOW</span>
@@ -64,14 +78,14 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
           </div>
 
           {/* Right Image Section with Curved Design */}
-          <div className="relative flex justify-center items-center animate-slide-in-right">
+          <div className="order-1 lg:order-2 flex justify-center items-center animate-slide-in-right">
             {/* Main Coffee Cup Container */}
-            <div className="relative">
+            <div className="relative w-64 h-64 lg:w-80 lg:h-80">
               {/* Glowing Background Circle */}
               <div className="absolute inset-0 w-96 h-96 bg-gradient-to-br from-amber-400/30 via-orange-400/20 to-coffee-400/10 rounded-full blur-2xl animate-pulse"></div>
               
               {/* Coffee Cup Image Container */}
-              <div className="relative w-80 h-80 bg-white rounded-full shadow-2xl flex items-center justify-center overflow-hidden animate-float border-8 border-white/80">
+              <div className="relative w-full h-full bg-white rounded-full shadow-2xl flex items-center justify-center overflow-hidden animate-float border-8 border-white/80">
                 {/* Coffee Cup with Heart Latte Art */}
                 <div className="relative w-64 h-64 bg-gradient-to-br from-amber-100 to-cream-200 rounded-full flex items-center justify-center border-4 border-coffee-200">
                   {/* Coffee Surface */}

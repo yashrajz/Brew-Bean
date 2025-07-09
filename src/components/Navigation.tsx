@@ -43,15 +43,15 @@ const Navigation = () => {
         ? 'bg-white/95 backdrop-blur-xl shadow-2xl border-b border-coffee-100/50' 
         : 'bg-transparent'
     }`}>
-      <div className="container mx-auto px-6 py-5">
+      <div className="container mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3 group cursor-pointer relative overflow-hidden" onClick={() => scrollToSection('home')}>
             <div className="relative">
-              <Coffee className="w-9 h-9 text-coffee-600 group-hover:text-coffee-500 transition-all duration-500 group-hover:scale-110 group-hover:rotate-12 drop-shadow-lg" />
+              <Coffee className="w-7 h-7 text-coffee-600 group-hover:text-coffee-500 transition-all duration-500 group-hover:scale-110 group-hover:rotate-12 drop-shadow-lg" />
               <div className="absolute inset-0 bg-coffee-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 scale-150 blur-xl"></div>
             </div>
             <div className="relative">
-              <span className="text-2xl font-playfair font-bold bg-gradient-to-r from-coffee-800 to-coffee-600 bg-clip-text text-transparent group-hover:from-coffee-600 group-hover:to-coffee-500 transition-all duration-500">
+              <span className="text-xl font-playfair font-bold bg-gradient-to-r from-coffee-800 to-coffee-600 bg-clip-text text-transparent group-hover:from-coffee-600 group-hover:to-coffee-500 transition-all duration-500">
                 Brew & Bean
               </span>
               <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-coffee-600 to-coffee-500 group-hover:w-full transition-all duration-500 ease-out"></div>
@@ -71,7 +71,7 @@ const Navigation = () => {
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
                 style={{ transitionDelay: isScrolled ? item.delay : '0ms' }}
-                className={`relative py-3 px-6 rounded-xl font-medium transition-all duration-500 ease-out group overflow-hidden ${
+                className={`relative py-2 px-4 rounded-lg font-medium transition-all duration-500 ease-out group overflow-hidden ${
                   activeSection === item.id
                     ? 'text-white bg-gradient-to-r from-coffee-600 to-coffee-500 shadow-lg shadow-coffee-600/30 scale-105'
                     : 'text-coffee-700 hover:text-white hover:scale-105'
@@ -96,7 +96,7 @@ const Navigation = () => {
             ))}
           </div>
 
-          <button className={`bg-gradient-to-r from-coffee-600 to-coffee-500 hover:from-coffee-500 hover:to-coffee-400 text-white px-8 py-3 rounded-full font-semibold transition-all duration-700 ease-out hidden md:block group relative overflow-hidden ${
+          <button className={`bg-gradient-to-r from-coffee-600 to-coffee-500 hover:from-coffee-500 hover:to-coffee-400 text-white px-6 py-2 rounded-md font-medium transition-all duration-700 ease-out hidden md:block group relative overflow-hidden ${
             isScrolled ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
           }`} style={{ transitionDelay: isScrolled ? '400ms' : '0ms' }}>
             {/* Animated background */}
@@ -112,13 +112,13 @@ const Navigation = () => {
             <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:left-full transition-all duration-700 ease-out"></div>
             
             {/* Shadow pulse */}
-            <div className="absolute inset-0 rounded-full bg-coffee-600 opacity-0 group-hover:opacity-30 scale-110 blur-xl transition-all duration-300"></div>
+            <div className="absolute inset-0 rounded-lg bg-coffee-600 opacity-0 group-hover:opacity-30 scale-110 blur-xl transition-all duration-300"></div>
           </button>
 
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`md:hidden p-3 rounded-xl transition-all duration-700 ease-out group relative overflow-hidden ${
+            className={`md:hidden p-2 rounded-lg transition-all duration-700 ease-out group relative overflow-hidden ${
               isScrolled 
                 ? 'opacity-100 translate-x-0 scale-100 text-coffee-700 hover:text-white bg-transparent hover:bg-gradient-to-r hover:from-coffee-600 hover:to-coffee-500' 
                 : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
@@ -131,8 +131,8 @@ const Navigation = () => {
             {/* Icon with rotation */}
             <div className="relative z-10 transition-transform duration-300">
               {isMobileMenuOpen ? 
-                <X className="w-6 h-6 rotate-0 group-hover:rotate-90 transition-transform duration-300" /> : 
-                <Menu className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+                <X className="w-5 h-5 rotate-0 group-hover:rotate-90 transition-transform duration-300" /> : 
+                <Menu className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
               }
             </div>
             
