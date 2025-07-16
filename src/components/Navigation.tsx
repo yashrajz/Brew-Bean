@@ -1,12 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { Coffee, Menu, X, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Coffee, Menu, X, ArrowRight, ShoppingCart } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 interface NavigationProps {
   isLoading?: boolean;
 }
 
 const Navigation: React.FC<NavigationProps> = ({ isLoading = false }) => {
+  const navigate = useNavigate();
+  const { state } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -105,25 +109,18 @@ const Navigation: React.FC<NavigationProps> = ({ isLoading = false }) => {
             ))}
           </div>
 
+          {/* Cart Icon - Hidden on mobile */}
           <button 
-            onClick={() => scrollToSection('menu')}
-            className={`bg-gradient-to-r from-coffee-600 to-coffee-500 hover:from-coffee-500 hover:to-coffee-400 text-white px-6 py-2 rounded-md font-medium transition-all duration-700 ease-out hidden md:block group relative overflow-hidden ${
-            isScrolled ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
-          }`} style={{ transitionDelay: isScrolled ? '400ms' : '0ms' }}>
-            {/* Animated background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-coffee-400 to-coffee-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            
-            {/* Button text */}
-            <span className="relative z-10 flex items-center space-x-2">
-              <span>Order Now</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-            </span>
-            
-            {/* Shine effect */}
-            <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:left-full transition-all duration-700 ease-out"></div>
-            
-            {/* Shadow pulse */}
-            <div className="absolute inset-0 rounded-lg bg-coffee-600 opacity-0 group-hover:opacity-30 scale-110 blur-xl transition-all duration-300"></div>
+            onClick={() => navigate('/cart')}
+            className={`relative p-2 rounded-lg transition-all duration-700 ease-out group overflow-hidden hidden md:block ${
+            isScrolled ? 'opacity-100 translate-x-0 scale-100 text-coffee-700 hover:text-white bg-transparent hover:bg-gradient-to-r hover:from-coffee-600 hover:to-coffee-500' : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
+          }`} style={{ transitionDelay: isScrolled ? '300ms' : '0ms' }}>
+            <ShoppingCart className="w-6 h-6 relative z-10" />
+            {state.items.length > 0 && (
+              <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                {state.items.reduce((sum, item) => sum + item.quantity, 0)}
+              </div>
+            )}
           </button>
 
           {/* Mobile menu button */}
@@ -134,7 +131,7 @@ const Navigation: React.FC<NavigationProps> = ({ isLoading = false }) => {
                 ? 'opacity-100 translate-x-0 scale-100 text-coffee-700 hover:text-white bg-transparent hover:bg-gradient-to-r hover:from-coffee-600 hover:to-coffee-500' 
                 : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
             }`}
-            style={{ transitionDelay: isScrolled ? '500ms' : '0ms' }}
+            style={{ transitionDelay: isScrolled ? '400ms' : '0ms' }}
           >
             {/* Background effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-coffee-600 to-coffee-500 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl"></div>
@@ -193,24 +190,34 @@ const Navigation: React.FC<NavigationProps> = ({ isLoading = false }) => {
               </button>
             ))}
             
-            <div className="pt-4">
-              <button 
-                onClick={() => scrollToSection('menu')}
-                className="w-full bg-gradient-to-r from-coffee-600 to-coffee-500 hover:from-coffee-500 hover:to-coffee-400 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-500 ease-out group relative overflow-hidden"
-                style={{ 
-                  transitionDelay: isMobileMenuOpen && isScrolled ? '200ms' : '0ms',
-                  transform: isMobileMenuOpen && isScrolled ? 'translateY(0)' : 'translateY(20px)'
-                }}
-              >
-                {/* Shine effect */}
-                <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:left-full transition-all duration-700 ease-out"></div>
-                
-                <span className="relative z-10 flex items-center justify-center space-x-2">
-                  <span>Order Now</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-                </span>
-              </button>
-            </div>
+            {/* Cart Button in Mobile Menu */}
+            <button
+              onClick={() => {
+                navigate('/cart');
+                setIsMobileMenuOpen(false);
+              }}
+              style={{ 
+                transitionDelay: isMobileMenuOpen && isScrolled ? '200ms' : '0ms',
+                transform: isMobileMenuOpen && isScrolled ? 'translateX(0)' : 'translateX(-20px)'
+              }}
+              className="block w-full text-left py-4 px-6 rounded-xl font-semibold transition-all duration-500 ease-out group relative overflow-hidden text-coffee-700 hover:text-white hover:bg-gradient-to-r hover:from-coffee-600 hover:to-coffee-500"
+            >
+              {/* Background effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-coffee-600 to-coffee-500 transition-all duration-300 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100"></div>
+              
+              {/* Content */}
+              <div className="relative z-10 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>Cart</span>
+                </div>
+                {state.items.length > 0 && (
+                  <div className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    {state.items.reduce((sum, item) => sum + item.quantity, 0)}
+                  </div>
+                )}
+              </div>
+            </button>
           </div>
         </div>
       </div>
