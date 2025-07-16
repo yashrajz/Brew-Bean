@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Coffee, Menu, X, ArrowRight, ShoppingCart } from 'lucide-react';
+import { Coffee, Menu, X, ArrowRight, ShoppingCart, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 interface NavigationProps {
   isLoading?: boolean;
@@ -11,6 +12,7 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ isLoading = false }) => {
   const navigate = useNavigate();
   const { state } = useCart();
+  const { wishlistItems } = useWishlist();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -109,19 +111,36 @@ const Navigation: React.FC<NavigationProps> = ({ isLoading = false }) => {
             ))}
           </div>
 
-          {/* Cart Icon - Hidden on mobile */}
-          <button 
-            onClick={() => navigate('/cart')}
-            className={`relative p-2 rounded-lg transition-all duration-700 ease-out group overflow-hidden hidden md:block ${
-            isScrolled ? 'opacity-100 translate-x-0 scale-100 text-coffee-700 hover:text-white bg-transparent hover:bg-gradient-to-r hover:from-coffee-600 hover:to-coffee-500' : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
-          }`} style={{ transitionDelay: isScrolled ? '300ms' : '0ms' }}>
-            <ShoppingCart className="w-6 h-6 relative z-10" />
-            {state.items.length > 0 && (
-              <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                {state.items.reduce((sum, item) => sum + item.quantity, 0)}
-              </div>
-            )}
-          </button>
+          {/* Action Buttons - Hidden on mobile */}
+          <div className="hidden md:flex items-center space-x-2">
+            {/* Wishlist Icon */}
+            <button 
+              onClick={() => navigate('/wishlist')}
+              className={`relative p-2 rounded-lg transition-all duration-700 ease-out group overflow-hidden ${
+              isScrolled ? 'opacity-100 translate-x-0 scale-100 text-coffee-700 hover:text-white bg-transparent hover:bg-gradient-to-r hover:from-coffee-600 hover:to-coffee-500' : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
+            }`} style={{ transitionDelay: isScrolled ? '250ms' : '0ms' }}>
+              <Heart className="w-6 h-6 relative z-10" />
+              {wishlistItems.length > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {wishlistItems.length}
+                </div>
+              )}
+            </button>
+
+            {/* Cart Icon */}
+            <button 
+              onClick={() => navigate('/cart')}
+              className={`relative p-2 rounded-lg transition-all duration-700 ease-out group overflow-hidden ${
+              isScrolled ? 'opacity-100 translate-x-0 scale-100 text-coffee-700 hover:text-white bg-transparent hover:bg-gradient-to-r hover:from-coffee-600 hover:to-coffee-500' : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
+            }`} style={{ transitionDelay: isScrolled ? '300ms' : '0ms' }}>
+              <ShoppingCart className="w-6 h-6 relative z-10" />
+              {state.items.length > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {state.items.reduce((sum, item) => sum + item.quantity, 0)}
+                </div>
+              )}
+            </button>
+          </div>
 
           {/* Mobile menu button */}
           <button
@@ -189,6 +208,35 @@ const Navigation: React.FC<NavigationProps> = ({ isLoading = false }) => {
                 }`}></div>
               </button>
             ))}
+            
+            {/* Wishlist Button in Mobile Menu */}
+            <button
+              onClick={() => {
+                navigate('/wishlist');
+                setIsMobileMenuOpen(false);
+              }}
+              style={{ 
+                transitionDelay: isMobileMenuOpen && isScrolled ? '150ms' : '0ms',
+                transform: isMobileMenuOpen && isScrolled ? 'translateX(0)' : 'translateX(-20px)'
+              }}
+              className="block w-full text-left py-4 px-6 rounded-xl font-semibold transition-all duration-500 ease-out group relative overflow-hidden text-coffee-700 hover:text-white hover:bg-gradient-to-r hover:from-coffee-600 hover:to-coffee-500"
+            >
+              {/* Background effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-coffee-600 to-coffee-500 transition-all duration-300 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100"></div>
+              
+              {/* Content */}
+              <div className="relative z-10 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Heart className="w-5 h-5" />
+                  <span>Wishlist</span>
+                </div>
+                {wishlistItems.length > 0 && (
+                  <div className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    {wishlistItems.length}
+                  </div>
+                )}
+              </div>
+            </button>
             
             {/* Cart Button in Mobile Menu */}
             <button

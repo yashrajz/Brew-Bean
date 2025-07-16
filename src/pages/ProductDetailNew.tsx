@@ -2,19 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Plus, Minus, ShoppingCart, Heart, Sparkles, Clock, Share2, Users, ChefHat, Leaf, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { products } from '../data/products';
 import { Product } from '../types';
+import { useToast } from '../hooks/use-toast';
 
 const ProductDetailNew: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { toast } = useToast();
   
   const [selectedSize, setSelectedSize] = useState('');
   const [customizations, setCustomizations] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [showNutrition, setShowNutrition] = useState(false);
 
   const product = products.find(p => p.id === id);
@@ -25,10 +28,12 @@ const ProductDetailNew: React.FC = () => {
       setCustomizations({});
       setQuantity(1);
       setSelectedImageIndex(0);
-      setIsWishlisted(false);
       setShowNutrition(false);
+      
+      // Scroll to top when product detail page loads
+      window.scrollTo(0, 0);
     }
-  }, [product]);
+  }, [id]); // Changed dependency from product to id to prevent unnecessary re-renders
 
   const getCurrentPrice = () => {
     if (!product) return 0;
@@ -57,7 +62,13 @@ const ProductDetailNew: React.FC = () => {
   const handleAddToCart = () => {
     if (product) {
       addToCart(product, quantity, selectedSize, customizations);
-      navigate('/cart');
+      
+      // Show success toast
+      toast({
+        title: "Added to Cart! 🛒",
+        description: `${quantity}x ${product.name}${selectedSize ? ` (${selectedSize})` : ''} added to your cart.`,
+        duration: 3000,
+      });
     }
   };
 
@@ -78,7 +89,23 @@ const ProductDetailNew: React.FC = () => {
   };
 
   const toggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
+    if (product) {
+      if (isInWishlist(product.id)) {
+        removeFromWishlist(product.id);
+        toast({
+          title: "Removed from Wishlist 💔",
+          description: `${product.name} removed from your wishlist.`,
+          duration: 2000,
+        });
+      } else {
+        addToWishlist(product);
+        toast({
+          title: "Added to Wishlist ❤️",
+          description: `${product.name} added to your wishlist.`,
+          duration: 2000,
+        });
+      }
+    }
   };
 
   const handleCustomizationChange = (category: string, option: string) => {
@@ -99,10 +126,10 @@ const ProductDetailNew: React.FC = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-coffee-800 mb-4">Product not found</h1>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate(-1)} // Use navigate(-1) to go back to previous page without reloading
             className="bg-coffee-600 text-white px-6 py-3 rounded-xl hover:bg-coffee-700 transition-colors"
           >
-            Back to Menu
+            Go Back
           </button>
         </div>
       </div>
@@ -148,7 +175,7 @@ const ProductDetailNew: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate(-1)} // Use navigate(-1) to go back to previous page
                   className="w-12 h-12 bg-coffee-100/50 hover:bg-coffee-200/50 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105"
                 >
                   <ArrowLeft className="w-5 h-5 text-coffee-600" />
@@ -174,178 +201,170 @@ const ProductDetailNew: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            
-            {/* Left Column - Enhanced Product Images */}
-            <div className="lg:col-span-1 space-y-6">
-              {/* Main Image with Zoom */}
-              <div className="relative aspect-square rounded-3xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl group">
-                <img 
-                  src={mockImages[selectedImageIndex]} 
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 cursor-zoom-in"
-                />
+        {/* Main Content - Updated Layout */}
+        <div className="container mx-auto px-4 py-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-4 gap-8">
+
+              {/* Main Content Area */}
+              <div className="lg:col-span-3 space-y-8">
                 
-                {/* Image Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
-                
-                {/* Popular Badge */}
-                {product.popular && (
-                  <div className="absolute top-6 left-6 bg-gradient-to-r from-amber-400/90 to-orange-400/90 backdrop-blur-sm border border-white/30 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center space-x-2">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Popular</span>
-                  </div>
-                )}
-
-                {/* Enhanced Heart Icon */}
-                <button
-                  onClick={toggleWishlist}
-                  className={`absolute top-6 right-6 w-12 h-12 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
-                    isWishlisted 
-                      ? 'bg-red-500/80 text-white' 
-                      : 'bg-white/20 text-white/80 hover:text-red-400 hover:bg-white/30'
-                  }`}
-                >
-                  <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
-                </button>
-
-                {/* Price Badge */}
-                <div className="absolute bottom-6 right-6 bg-white/90 backdrop-blur-sm border border-white/30 text-coffee-800 px-6 py-3 rounded-full font-bold text-2xl shadow-lg">
-                  ₹{getCurrentPrice()}
-                </div>
-
-                {/* Image Navigation Arrows */}
-                {mockImages.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => setSelectedImageIndex((prev) => (prev - 1 + mockImages.length) % mockImages.length)}
-                      className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-all duration-300"
-                    >
-                      <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => setSelectedImageIndex((prev) => (prev + 1) % mockImages.length)}
-                      className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-all duration-300"
-                    >
-                      <ArrowLeft className="w-5 h-5 rotate-180" />
-                    </button>
-                  </>
-                )}
-              </div>
-
-              {/* Image Thumbnails */}
-              {mockImages.length > 1 && (
-                <div className="flex space-x-4">
-                  {mockImages.map((img, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImageIndex(index)}
-                      className={`flex-1 aspect-square rounded-2xl overflow-hidden border-3 transition-all duration-300 ${
-                        selectedImageIndex === index 
-                          ? 'border-coffee-600 scale-105' 
-                          : 'border-coffee-200 hover:border-coffee-400'
-                      }`}
-                    >
-                      <img src={img} alt={`${product.name} ${index + 1}`} className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Middle Column - Product Details & Options */}
-            <div className="lg:col-span-1 space-y-6">
-              {/* Enhanced Basic Info */}
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
-                <h1 className="text-4xl font-playfair font-bold text-coffee-800 mb-4">{product.name}</h1>
-                
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-6 h-6 ${
-                            i < Math.floor(product.rating)
-                              ? 'text-amber-500 fill-current'
-                              : 'text-coffee-300'
-                          }`}
+                {/* Product Overview Section */}
+                <div id="product-details" className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                  <div className="grid lg:grid-cols-2 gap-8">
+                    
+                    {/* Product Images */}
+                    <div className="space-y-4">
+                      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-coffee-100/20 to-coffee-200/10 group max-w-md mx-auto">
+                        <img 
+                          src={mockImages[selectedImageIndex]} 
+                          alt={product.name}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
-                      ))}
-                      <span className="text-coffee-600 font-semibold text-lg ml-2">({product.rating})</span>
-                    </div>
-                    <div className="flex items-center space-x-1 text-coffee-500">
-                      <Users className="w-4 h-4" />
-                      <span className="text-sm">150+ reviews</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <span className="text-coffee-500 uppercase text-xs font-medium tracking-wider bg-coffee-100/50 px-3 py-1 rounded-full">
-                      {product.category}
-                    </span>
-                    {product.category === 'coffee' && (
-                      <div className="flex items-center space-x-1 text-green-600 bg-green-100/50 px-3 py-1 rounded-full">
-                        <Leaf className="w-4 h-4" />
-                        <span className="text-xs font-medium">Organic</span>
+                        
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+                        
+                        {product.popular && (
+                          <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-400/90 to-orange-400/90 backdrop-blur-sm border border-white/30 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg flex items-center space-x-1.5">
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>Popular</span>
+                          </div>
+                        )}
+
+                        {/* Image Navigation */}
+                        {mockImages.length > 1 && (
+                          <>
+                            <button
+                              onClick={() => setSelectedImageIndex((prev) => (prev - 1 + mockImages.length) % mockImages.length)}
+                              className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all duration-300"
+                            >
+                              <ArrowLeft className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setSelectedImageIndex((prev) => (prev + 1) % mockImages.length)}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all duration-300"
+                            >
+                              <ArrowLeft className="w-4 h-4 rotate-180" />
+                            </button>
+                          </>
+                        )}
                       </div>
-                    )}
+
+                      {/* Thumbnails */}
+                      {mockImages.length > 1 && (
+                        <div className="grid grid-cols-3 gap-2 max-w-md mx-auto">
+                          {mockImages.map((img, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setSelectedImageIndex(index)}
+                              className={`aspect-[4/3] rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                                selectedImageIndex === index 
+                                  ? 'border-coffee-600 scale-105' 
+                                  : 'border-coffee-200 hover:border-coffee-400'
+                              }`}
+                            >
+                              <img src={img} alt={`${product.name} ${index + 1}`} className="w-full h-full object-cover" />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Product Information */}
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-coffee-500 uppercase text-xs font-medium tracking-wider bg-coffee-100/60 px-3 py-1.5 rounded-full">
+                            {product.category}
+                          </span>
+                          <div className="text-2xl font-bold text-coffee-800">₹{getCurrentPrice()}</div>
+                        </div>
+                        
+                        <h1 className="text-2xl lg:text-3xl font-playfair font-bold text-coffee-800 mb-4">{product.name}</h1>
+                        
+                        <div className="flex items-center space-x-4 mb-4">
+                          <div className="flex items-center space-x-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-5 h-5 ${
+                                  i < Math.floor(product.rating) ? 'text-amber-500 fill-current' : 'text-coffee-300'
+                                }`}
+                              />
+                            ))}
+                            <span className="text-coffee-600 font-semibold ml-2">({product.rating})</span>
+                          </div>
+                          <div className="flex items-center space-x-1 text-coffee-500">
+                            <Users className="w-4 h-4" />
+                            <span className="text-sm">150+ reviews</span>
+                          </div>
+                        </div>
+
+                        <p className="text-coffee-700 leading-relaxed mb-6">{product.description}</p>
+                        
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="bg-coffee-50/60 rounded-xl p-4 text-center">
+                            <div className="flex items-center justify-center space-x-1.5 mb-2">
+                              <Clock className="w-4 h-4 text-coffee-600" />
+                              <span className="text-coffee-700 font-medium text-sm">Prep Time</span>
+                            </div>
+                            <div className="text-coffee-800 font-semibold">{preparationTime}</div>
+                          </div>
+                          <div className="bg-coffee-50/60 rounded-xl p-4 text-center">
+                            <div className="flex items-center justify-center space-x-1.5 mb-2">
+                              <ChefHat className="w-4 h-4 text-coffee-600" />
+                              <span className="text-coffee-700 font-medium text-sm">Quality</span>
+                            </div>
+                            <div className="text-coffee-800 font-semibold">Premium</div>
+                          </div>
+                          <div className="bg-coffee-50/60 rounded-xl p-4 text-center">
+                            <div className="flex items-center justify-center space-x-1.5 mb-2">
+                              <Leaf className="w-4 h-4 text-green-600" />
+                              <span className="text-green-700 font-medium text-sm">Organic</span>
+                            </div>
+                            <div className="text-green-800 font-semibold">Certified</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <p className="text-coffee-700 leading-relaxed text-lg mb-6">{product.description}</p>
-                
-                {/* Quick Info Pills */}
-                <div className="flex flex-wrap gap-3 mb-6">
-                  <div className="flex items-center space-x-2 bg-coffee-100/50 px-4 py-2 rounded-full">
-                    <ChefHat className="w-5 h-5 text-coffee-600" />
-                    <span className="text-coffee-700 font-medium">Handcrafted</span>
-                  </div>
-                  <div className="flex items-center space-x-2 bg-coffee-100/50 px-4 py-2 rounded-full">
-                    <Clock className="w-5 h-5 text-coffee-600" />
-                    <span className="text-coffee-700 font-medium">{preparationTime}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Options Section */}
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
-                {/* Size Selection */}
+                {/* Size Selection Section */}
                 {product.sizes && product.sizes.length > 0 && (
-                  <div className="mb-8">
-                    <h3 className="text-xl font-semibold text-coffee-800 mb-4 flex items-center">
-                      <span>Size</span>
-                      <span className="ml-3 text-sm text-coffee-500 font-normal">Choose your perfect size</span>
-                    </h3>
-                    <div className="grid grid-cols-3 gap-4">
+                  <div id="size-options" className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                    <h2 className="text-xl font-semibold text-coffee-800 mb-4">Choose Your Size</h2>
+                    <div className="grid grid-cols-3 gap-6">
                       {product.sizes.map((size) => (
                         <button
                           key={size.name}
                           onClick={() => handleSizeChange(size.name)}
-                          className={`p-4 rounded-2xl border-3 transition-all duration-300 ${
+                          className={`p-4 rounded-xl border-2 transition-all duration-300 text-center ${
                             selectedSize === size.name
                               ? 'border-coffee-600 bg-coffee-50 shadow-lg transform scale-105'
-                              : 'border-coffee-200 hover:border-coffee-400 hover:shadow-md'
+                              : 'border-coffee-200 hover:border-coffee-400 hover:scale-102'
                           }`}
                         >
-                          <div className="font-semibold text-coffee-800 text-lg">{size.name}</div>
-                          <div className="text-coffee-600">₹{size.price}</div>
+                          <div className="font-bold text-coffee-800 text-base mb-1">{size.name}</div>
+                          <div className="text-coffee-600 text-sm">₹{size.price}</div>
+                          <div className="text-coffee-500 text-xs mt-1">
+                            {size.name === 'Small' ? '8 oz' : size.name === 'Medium' ? '12 oz' : '16 oz'}
+                          </div>
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Customizations */}
+                {/* Customizations Section */}
                 {product.customizations && product.customizations.length > 0 && (
-                  <div className="space-y-6">
+                  <div id="customizations" className="space-y-6">
+                    <h2 className="text-2xl font-semibold text-coffee-800">Customize Your Order</h2>
                     {product.customizations.map((customization) => (
-                      <div key={customization.name}>
+                      <div key={customization.name} className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
                         <h3 className="text-xl font-semibold text-coffee-800 mb-4">
                           {customization.name}
-                          {customization.additionalCost !== undefined && (
+                          {customization.additionalCost !== undefined && customization.additionalCost > 0 && (
                             <span className="text-sm text-coffee-600 font-normal ml-2">
                               (+₹{customization.additionalCost} each)
                             </span>
@@ -356,20 +375,19 @@ const ProductDetailNew: React.FC = () => {
                             <button
                               key={option}
                               onClick={() => handleCustomizationChange(customization.name, option)}
-                              className={`p-4 rounded-2xl border-3 text-left transition-all duration-300 ${
+                              className={`p-4 rounded-xl border-2 text-left transition-all duration-300 ${
                                 customizations[customization.name] === option
-                                  ? 'border-coffee-600 bg-coffee-50 shadow-lg transform scale-105'
-                                  : 'border-coffee-200 hover:border-coffee-400 hover:shadow-md'
+                                  ? 'border-coffee-600 bg-coffee-50 shadow-md transform scale-105'
+                                  : 'border-coffee-200 hover:border-coffee-400 hover:scale-102'
                               }`}
                             >
-                              <span className="text-coffee-800 font-medium text-lg">{option}</span>
-                              {option.toLowerCase() === 'none' || option.toLowerCase() === 'no' || option.toLowerCase() === 'plain' ? (
-                                <div className="text-sm text-green-600 mt-1 font-medium">Free</div>
-                              ) : (
-                                customization.additionalCost && (
+                              <span className="text-coffee-800 font-medium">{option}</span>
+                              {customization.additionalCost && 
+                                customization.additionalCost > 0 &&
+                                !['none', 'no', 'plain', 'regular'].includes(option.toLowerCase()) && (
                                   <div className="text-sm text-coffee-600 mt-1">+₹{customization.additionalCost}</div>
                                 )
-                              )}
+                              }
                             </button>
                           ))}
                         </div>
@@ -377,189 +395,156 @@ const ProductDetailNew: React.FC = () => {
                     ))}
                   </div>
                 )}
-              </div>
 
-              {/* Quantity and Add to Cart */}
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
-                <div className="flex items-center justify-between mb-6">
-                  <span className="text-xl font-semibold text-coffee-800">Quantity</span>
-                  <div className="flex items-center space-x-6">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-12 h-12 bg-coffee-100 hover:bg-coffee-200 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105"
-                    >
-                      <Minus className="w-5 h-5 text-coffee-600" />
-                    </button>
-                    <span className="text-2xl font-semibold text-coffee-800 min-w-[4rem] text-center">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="w-12 h-12 bg-coffee-100 hover:bg-coffee-200 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105"
-                    >
-                      <Plus className="w-5 h-5 text-coffee-600" />
-                    </button>
+                {/* Nutrition Section */}
+                <div id="nutrition" className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                  <h2 className="text-2xl font-semibold text-coffee-800 mb-6">Nutrition Information</h2>
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                    {Object.entries(mockNutrition).map(([key, value]) => (
+                      <div key={key} className="text-center bg-coffee-50/50 rounded-xl p-4">
+                        <div className="text-2xl font-bold text-coffee-800 mb-1">{value}</div>
+                        <div className="text-coffee-600 capitalize text-sm">{key}</div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="bg-amber-50/50 rounded-xl p-4 border border-amber-200/50">
+                    <h4 className="font-semibold text-amber-800 mb-2">Allergen Information</h4>
+                    <p className="text-amber-700">Contains: Milk, Soy. May contain traces of nuts and gluten.</p>
                   </div>
                 </div>
 
-                <button
-                  onClick={handleAddToCart}
-                  className="w-full bg-gradient-to-r from-coffee-600 to-coffee-700 hover:from-coffee-700 hover:to-coffee-800 text-white py-5 px-8 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-4 text-xl"
-                >
-                  <ShoppingCart className="w-6 h-6" />
-                  <span>Add to Cart - ₹{getCurrentPrice() * quantity}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Right Column - Reviews & Additional Info */}
-            <div className="lg:col-span-1 space-y-6">
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
-                {/* Tab Navigation */}
-                <div className="flex border-b border-coffee-100/30">
-                  <button
-                    onClick={() => setShowNutrition(false)}
-                    className={`flex-1 px-6 py-4 font-medium transition-all duration-300 ${
-                      !showNutrition
-                        ? 'text-coffee-800 bg-coffee-50/50 border-b-3 border-coffee-600'
-                        : 'text-coffee-500 hover:text-coffee-700 hover:bg-coffee-50/30'
-                    }`}
-                  >
-                    Reviews
-                  </button>
-                  <button
-                    onClick={() => setShowNutrition(true)}
-                    className={`flex-1 px-6 py-4 font-medium transition-all duration-300 ${
-                      showNutrition
-                        ? 'text-coffee-800 bg-coffee-50/50 border-b-3 border-coffee-600'
-                        : 'text-coffee-500 hover:text-coffee-700 hover:bg-coffee-50/30'
-                    }`}
-                  >
-                    Nutrition
-                  </button>
+                {/* Reviews Section */}
+                <div id="reviews" className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                  <h2 className="text-2xl font-semibold text-coffee-800 mb-6">Customer Reviews</h2>
+                  <div className="grid lg:grid-cols-3 gap-6">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-coffee-800 mb-2">{product.rating}</div>
+                      <div className="flex items-center justify-center space-x-1 mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-5 h-5 ${
+                              i < Math.floor(product.rating) ? 'text-amber-500 fill-current' : 'text-coffee-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <div className="text-coffee-600">Based on 150+ reviews</div>
+                    </div>
+                    
+                    <div className="lg:col-span-2 space-y-4">
+                      {mockReviews.map((review, index) => (
+                        <div key={index} className="bg-coffee-50/50 rounded-xl p-4 border border-coffee-100/50">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-semibold text-coffee-800">{review.name}</span>
+                            <span className="text-sm text-coffee-500">{review.date}</span>
+                          </div>
+                          <div className="flex items-center space-x-1 mb-2">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < review.rating ? 'text-amber-500 fill-current' : 'text-coffee-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <p className="text-coffee-700 leading-relaxed">{review.comment}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+              </div>
 
-                {/* Content Area */}
-                <div className="p-6 max-h-[600px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                  {!showNutrition ? (
-                    /* Reviews Section */
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-semibold text-coffee-800">Customer Reviews</h3>
-                        <div className="text-sm text-coffee-600">
-                          {mockReviews.length} reviews
-                        </div>
+              {/* Right Sidebar - Order Summary & Actions */}
+              <div className="lg:col-span-1">
+                <div className="space-y-6 lg:sticky lg:top-24">
+                  
+                  {/* Order Summary */}
+                  <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl">
+                    <h3 className="text-lg font-semibold text-coffee-800 mb-4">Order Summary</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-coffee-600 text-sm">Base Price</span>
+                        <span className="font-medium text-coffee-800">₹{selectedSize ? product.sizes?.find(s => s.name === selectedSize)?.price || product.price : product.price}</span>
                       </div>
                       
-                      {/* Review Summary */}
-                      <div className="bg-coffee-50/50 rounded-2xl p-6 border border-coffee-100/50">
-                        <div className="flex items-center space-x-6">
-                          <div className="text-center">
-                            <div className="text-4xl font-bold text-coffee-800">{product.rating}</div>
-                            <div className="flex items-center justify-center space-x-1 mb-2">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`w-5 h-5 ${
-                                    i < Math.floor(product.rating)
-                                      ? 'text-amber-500 fill-current'
-                                      : 'text-coffee-300'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            <div className="text-sm text-coffee-600">out of 5</div>
+                      {Object.entries(customizations).filter(([_, value]) => value && !['none', 'no', 'plain', 'regular'].includes(value.toLowerCase())).map(([category, option]) => {
+                        const customization = product.customizations?.find(c => c.name === category);
+                        return customization?.additionalCost ? (
+                          <div key={category} className="flex justify-between items-center">
+                            <span className="text-coffee-600 text-sm">{option}</span>
+                            <span className="font-medium text-coffee-800">+₹{customization.additionalCost}</span>
                           </div>
-                          <div className="flex-1">
-                            <div className="text-sm text-coffee-600 mb-3">Based on 150+ reviews</div>
-                            <div className="space-y-2">
-                              {[5, 4, 3, 2, 1].map((rating) => (
-                                <div key={rating} className="flex items-center space-x-3">
-                                  <span className="text-sm text-coffee-600 w-4">{rating}</span>
-                                  <div className="flex-1 h-3 bg-coffee-100 rounded-full overflow-hidden">
-                                    <div 
-                                      className="h-full bg-amber-400 rounded-full transition-all duration-500"
-                                      style={{ width: rating === 5 ? '70%' : rating === 4 ? '20%' : '5%' }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Individual Reviews */}
-                      <div className="space-y-4">
-                        {mockReviews.map((review, index) => (
-                          <div key={index} className="bg-white/50 rounded-2xl p-6 border border-coffee-100/50">
-                            <div className="flex items-start justify-between mb-3">
-                              <div>
-                                <div className="font-semibold text-coffee-800 text-lg">{review.name}</div>
-                                <div className="flex items-center space-x-1">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      className={`w-4 h-4 ${
-                                        i < review.rating
-                                          ? 'text-amber-500 fill-current'
-                                          : 'text-coffee-300'
-                                      }`}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                              <div className="text-sm text-coffee-500">{review.date}</div>
-                            </div>
-                            <p className="text-coffee-700 leading-relaxed">{review.comment}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    /* Nutrition Section */
-                    <div className="space-y-6">
-                      <h3 className="text-xl font-semibold text-coffee-800">Nutritional Information</h3>
+                        ) : null;
+                      })}
                       
-                      <div className="bg-coffee-50/50 rounded-2xl p-6 border border-coffee-100/50">
-                        <div className="grid grid-cols-2 gap-6">
-                          <div className="text-center">
-                            <div className="text-3xl font-bold text-coffee-800">{mockNutrition.calories}</div>
-                            <div className="text-sm text-coffee-600">Calories</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-3xl font-bold text-coffee-800">{mockNutrition.caffeine}</div>
-                            <div className="text-sm text-coffee-600">Caffeine</div>
+                      <div className="border-t border-coffee-100/50 pt-3">
+                        <div className="flex justify-between items-center">
+                          <span className="font-semibold text-coffee-800">Subtotal</span>
+                          <span className="font-bold text-coffee-800">₹{getCurrentPrice()}</span>
+                        </div>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="font-semibold text-coffee-800">Quantity</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                              className="w-7 h-7 bg-coffee-100 hover:bg-coffee-200 rounded-lg flex items-center justify-center transition-all duration-300"
+                            >
+                              <Minus className="w-3 h-3 text-coffee-600" />
+                            </button>
+                            <span className="font-semibold text-coffee-800 min-w-[2rem] text-center">{quantity}</span>
+                            <button
+                              onClick={() => setQuantity(quantity + 1)}
+                              className="w-7 h-7 bg-coffee-100 hover:bg-coffee-200 rounded-lg flex items-center justify-center transition-all duration-300"
+                            >
+                              <Plus className="w-3 h-3 text-coffee-600" />
+                            </button>
                           </div>
                         </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        {Object.entries(mockNutrition).filter(([key]) => !['calories', 'caffeine'].includes(key)).map(([key, value]) => (
-                          <div key={key} className="flex justify-between items-center py-3 border-b border-coffee-100/30">
-                            <span className="text-coffee-700 capitalize font-medium">{key}</span>
-                            <span className="font-semibold text-coffee-800">{value}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Allergen Information */}
-                      <div className="bg-amber-50/50 rounded-2xl p-6 border border-amber-200/50">
-                        <h4 className="font-semibold text-amber-800 mb-3">Allergen Information</h4>
-                        <p className="text-sm text-amber-700">
-                          Contains: Milk, Soy. May contain traces of nuts and gluten.
-                        </p>
-                      </div>
-
-                      {/* Ingredients */}
-                      <div className="bg-green-50/50 rounded-2xl p-6 border border-green-200/50">
-                        <h4 className="font-semibold text-green-800 mb-3">Ingredients</h4>
-                        <p className="text-sm text-green-700">
-                          Organic coffee beans, filtered water, organic milk, natural sweeteners.
-                        </p>
+                        <div className="flex justify-between items-center mt-3 pt-3 border-t border-coffee-100/50">
+                          <span className="text-lg font-bold text-coffee-800">Total</span>
+                          <span className="text-xl font-bold text-coffee-800">₹{getCurrentPrice() * quantity}</span>
+                        </div>
                       </div>
                     </div>
-                  )}
+                    
+                    <button
+                      onClick={handleAddToCart}
+                      className="w-full bg-gradient-to-r from-coffee-600 to-coffee-700 hover:from-coffee-700 hover:to-coffee-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center space-x-2 mt-4"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      <span>Add to Cart</span>
+                    </button>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl">
+                    <h3 className="text-lg font-semibold text-coffee-800 mb-4">Quick Actions</h3>
+                    <div className="space-y-3">
+                      <button
+                        onClick={toggleWishlist}
+                        className={`w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg transition-all duration-300 ${
+                          product && isInWishlist(product.id)
+                            ? 'bg-red-50 text-red-700 border border-red-200' 
+                            : 'bg-coffee-50 text-coffee-700 border border-coffee-200 hover:bg-coffee-100'
+                        }`}
+                      >
+                        <Heart className={`w-4 h-4 ${product && isInWishlist(product.id) ? 'fill-current' : ''}`} />
+                        <span className="text-sm font-medium">{product && isInWishlist(product.id) ? 'Wishlisted' : 'Add to Wishlist'}</span>
+                      </button>
+                      
+                      <button
+                        onClick={handleShare}
+                        className="w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg bg-coffee-50 text-coffee-700 border border-coffee-200 hover:bg-coffee-100 transition-all duration-300"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        <span className="text-sm font-medium">Share Product</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
