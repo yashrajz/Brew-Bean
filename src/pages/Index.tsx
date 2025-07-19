@@ -12,31 +12,21 @@ const Index = () => {
   const navigate = useNavigate();
   const [scrollY, setScrollY] = useState(0);
   
-  // Only show loading on first visit or page refresh, not when navigating back
+  // Show loading screen only on page refresh, not on any navigation
   const [isLoading, setIsLoading] = useState(() => {
-    // Check various indicators that this might be a back navigation
-    const hasLoadedBefore = sessionStorage.getItem('hasLoadedHomePage');
+    // Check if we've navigated to this page before in this session
+    const hasNavigatedBefore = sessionStorage.getItem('hasNavigatedToHome');
     
-    // Check if this is back navigation using different methods
-    let isBackNavigation = false;
-    
-    // Method 1: Check performance.navigation (deprecated but still widely supported)
-    if (window.performance?.navigation?.type === 2) {
-      isBackNavigation = true;
+    // If we've been here before in this session, don't show loading
+    if (hasNavigatedBefore) {
+      return false;
     }
     
-    // Method 2: Check document.referrer from the same origin (indicates internal navigation)
-    if (document.referrer && document.referrer.includes(window.location.origin)) {
-      isBackNavigation = true;
-    }
+    // Check if this is a direct page refresh (not navigation)
+    const isDirectAccess = !document.referrer || !document.referrer.includes(window.location.origin);
     
-    // Method 3: Check if we have history state (indicates browser navigation)
-    if (window.history.state !== null) {
-      isBackNavigation = true;
-    }
-    
-    // Only show loading if it's the first visit AND not a back navigation
-    return !hasLoadedBefore && !isBackNavigation;
+    // Only show loading on direct access (refresh, new tab, direct URL)
+    return isDirectAccess;
   });
 
   useEffect(() => {
@@ -46,15 +36,13 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    // Mark that the home page has been loaded in this session
-    sessionStorage.setItem('hasLoadedHomePage', 'true');
+    // Mark that we've navigated to home page in this session
+    sessionStorage.setItem('hasNavigatedToHome', 'true');
     
-    // Clear the flag on page unload so it shows loading on fresh visits
+    // Clear the flag when the session ends (page is closed/refreshed)
     const handleBeforeUnload = () => {
-      // Only clear if it's a page refresh (not navigation)
-      if (performance.navigation?.type === 1) { // TYPE_RELOAD
-        sessionStorage.removeItem('hasLoadedHomePage');
-      }
+      // Only clear if it's a page refresh/close, not navigation
+      sessionStorage.removeItem('hasNavigatedToHome');
     };
     
     window.addEventListener('beforeunload', handleBeforeUnload);
